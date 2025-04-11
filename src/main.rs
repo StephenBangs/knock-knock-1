@@ -1,10 +1,30 @@
 use axum::{Router, routing::get};
+use axum::response;
 //not adding axum extra crate
 use tokio::net;
 //make new router, init with stuff
 
-async fn hello() -> String {
-    "<html><body><p>hello world</p></body></html>".to_string()
+struct Joke {
+    whos_there: &'static str,
+    answer: &'static str,
+}
+
+const THE_JOKE: Joke = Joke {
+    whos_there: "Boo",
+    answer: "Don't cry about it!",
+//     whos_there.to_string(),
+//     answer.to_string(),
+};
+
+fn render_joke(joke: &Joke) -> String {
+    format!("<p>Knock Knock!</p><p>Who's there?</p><p>{}</p><p>{} Who?</p>", joke.whos_there, joke.answer)
+}
+
+
+async fn hello() -> response::Html<String> {
+    //"<html><body><p>hello world</p></body></html>".to_string()
+    let joke = render_joke(&THE_JOKE);
+    response::Html(format!(r#"<head><title>"Knock Knock!"</title></head><body>{}</body></html>"#, joke))
 }
 
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
